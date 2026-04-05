@@ -131,18 +131,18 @@
           3) 소유권 관리
         </button>
         <button
-          onclick="switchTab('s5-umask')"
-          id="btn-s5-umask"
+          onclick="switchTab('s4-umask')"
+          id="btn-s4-umask"
           class="nav-btn text-left px-4 py-3 rounded-lg text-sm text-slate-600 transition-colors"
         >
-          5) 기본 접근 권한
+          4) 기본 접근 권한
         </button>
         <button
-          onclick="switchTab('s6-special')"
-          id="btn-s6-special"
+          onclick="switchTab('s5-special')"
+          id="btn-s5-special"
           class="nav-btn text-left px-4 py-3 rounded-lg text-sm text-slate-600 transition-colors"
         >
-          6) 특수 접근 권한
+          5) 특수 접근 권한
         </button>
       </div>
     </nav>
@@ -1464,171 +1464,737 @@
           </div>
         </div>
 
-        <!-- ============================== 5) 기본 접근 권한 ============================== -->
-        <div
-          id="s5-umask"
-          class="section-content flex-col h-full justify-center"
-        >
-          <div>
-            <h3
-              class="text-3xl font-bold text-slate-800 border-l-4 border-[#4897e4] pl-3 mb-3 py-2"
+        <!-- ============================== 4) 기본 접근 권한 ============================== -->
+
+        <div id="s4-umask" class="section-content flex-col h-full">
+          <div class="flex gap-2 mb-4 flex-shrink-0">
+            <button
+              onclick="switchSub(this, 's4-1')"
+              class="sub-btn active px-4 py-2 rounded-md text-sm"
             >
-              베이스
-            </h3>
-            <p>
-              <strong class="text-white bg-slate-700 px-2 py-1 rounded mr-2"
-                >755</strong
-              >
-              디렉터리 표준 (소유자 전체, 그룹/기타 읽기+탐색)
-            </p>
-            <p>
-              <strong class="text-white bg-slate-700 px-2 py-1 rounded mr-2"
-                >644</strong
-              >
-              일반 파일 표준 (소유자 읽기+쓰기, 그룹/기타 읽기)
-            </p>
-          </div>
-          <div
-            class="bg-blue-50 border-l-4 border-[#4897e4] p-4 mb-8 flex-shrink-0"
-          >
-            <h4 class="font-bold text-[#4897e4] text-base mb-1">
-              기본 명령어: umask (User file-creation Mode Mask)
-            </h4>
-            <p class="text-sm text-slate-700">
-              새 파일이나 디렉터리 생성 시 부여되지 않아야 할 권한(마스크)을
-              설정합니다. (기본 디렉터리 777, 파일 666에서 umask 값을 뺌)
-            </p>
+              4-1. umask 원리와 명령어
+            </button>
+            <!-- <button
+              onclick="switchSub(this, 's4-2')"
+              class="sub-btn px-4 py-2 rounded-md text-sm"
+            >
+              4-2. 실무 적용 및 영구 설정
+            </button> -->
           </div>
 
           <div
-            class="flex flex-col md:flex-row gap-6 items-center w-full max-w-4xl mx-auto"
+            id="s4-1"
+            class="sub-content active flex-col h-full flex-grow overflow-y-auto pr-2 gap-8"
           >
-            <div class="w-full md:w-1/2 space-y-4">
-              <div>
-                <label class="block text-sm font-bold text-slate-600 mb-1"
-                  >생성 대상 유형 (Max 값)</label
-                >
-                <select
-                  id="umask-type"
-                  onchange="calcUmask()"
-                  class="w-full bg-slate-50 border border-slate-300 text-slate-900 text-base rounded focus:ring-[#4897e4] p-3"
-                >
-                  <option value="dir">디렉터리 (최대 777)</option>
-                  <option value="file">일반 파일 (최대 666)</option>
-                </select>
-              </div>
-              <div>
-                <label class="block text-sm font-bold text-slate-600 mb-1"
-                  >umask 설정값 입력</label
-                >
-                <input
-                  type="number"
-                  id="umask-input"
-                  value="022"
-                  oninput="calcUmask()"
-                  class="w-full bg-slate-50 border border-slate-300 text-slate-900 font-mono text-xl rounded p-3 text-center"
-                />
-              </div>
-            </div>
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 h-full">
+              <div class="flex flex-col gap-6">
+                <div>
+                  <h3
+                    class="text-3xl font-bold text-slate-800 border-l-4 border-[#4897e4] pl-3 mb-3 py-2"
+                  >
+                    권한의 가림막: umask &lt;8진수 마스크 값&gt;
+                  </h3>
+                  <p class="text-xl text-slate-600 leading-relaxed pl-5">
+                    새로운 파일이나 디렉터리를 생성할 때
+                    <strong>기본적으로 차단할 권한</strong>을 지정합니다. 전체
+                    권한에서 특정 권한을 가려서 못 쓰게 만드는 원리입니다.
+                  </p>
+                </div>
 
-            <div
-              class="w-full md:w-1/2 bg-slate-900 rounded-lg p-6 text-center shadow-lg border border-slate-800 flex flex-col justify-center"
-            >
-              <div
-                class="text-sm text-slate-400 mb-2 font-bold tracking-widest"
-              >
-                결과 연산
+                <div class="flex flex-col gap-5 pl-3">
+                  <div
+                    class="bg-blue-50 border border-blue-200 rounded-xl p-5 shadow-sm"
+                  >
+                    <h4 class="text-xl font-bold text-blue-700 mb-2">
+                      시스템 허용 권한 (777 / 666)
+                    </h4>
+                    <ul
+                      class="list-disc list-inside text-lg text-blue-800 leading-relaxed space-y-1"
+                    >
+                      <li>
+                        <strong>디렉터리:</strong> <code>777</code> (rwxrwxrwx)
+                        - 접근/탐색(x)이 필수적임
+                      </li>
+                      <li>
+                        <strong>일반 파일:</strong> <code>666</code> (rw-rw-rw-)
+                        - 보안상 실행 권한은 명시적 부여가 필요
+                      </li>
+                    </ul>
+                  </div>
+
+                  <div
+                    class="bg-emerald-50 border border-emerald-200 rounded-xl p-5 shadow-sm"
+                  >
+                    <h4 class="text-xl font-bold text-emerald-800 mb-2">
+                      리눅스 표준 생성 권한 (755 / 644)
+                    </h4>
+                    <p class="text-lg text-emerald-700 leading-relaxed">
+                      대부분의 리눅스는 기본 umask가 <strong>022</strong>로
+                      설정되어 있습니다. 따라서 디렉터리는 타인의 쓰기만
+                      방지되는
+                      <code class="bg-emerald-100 px-1 rounded"
+                        >755 (rwxr-xr-x)</code
+                      >로, 파일은 소유자만 수정 가능한
+                      <code class="bg-emerald-100 px-1 rounded"
+                        >644 (rw-r--r--)</code
+                      >
+                      상태로 안전하게 생성되는 것이 시스템 표준입니다.
+                    </p>
+                  </div>
+
+                  <div
+                    class="bg-red-50 border border-red-200 rounded-xl p-5 shadow-sm"
+                  >
+                    <h4
+                      class="text-xl font-bold text-red-700 mb-2 flex items-center gap-2"
+                    >
+                      <span class="text-2xl">&#x26A0;&#xFE0F;</span> 단순 뺄셈의
+                      함정 (비트 연산)
+                    </h4>
+                    <p class="text-lg text-red-800 leading-relaxed">
+                      umask는 뺄셈이 아닌
+                      <strong>비트 차단(AND NOT) 연산</strong>입니다. umask가
+                      003일 때 파일(666)에서 빼서 663(rwxrwx-wx)이 되는 것이
+                      아니라, 애초에 없는 실행 권한은 무시되고 쓰기 권한만
+                      차단되어 <strong>664(rw-rw-r--)</strong>가 됩니다.
+                    </p>
+                  </div>
+                </div>
               </div>
-              <div
-                class="flex items-center justify-center gap-3 text-4xl font-mono mb-2"
-              >
-                <span id="umask-max" class="text-slate-500">777</span>
-                <span class="text-slate-600">-</span>
-                <span id="umask-val" class="text-slate-300">022</span>
-                <span class="text-slate-600">=</span>
-                <span id="umask-result" class="font-bold text-green-400"
-                  >755</span
-                >
-              </div>
-              <div
-                id="umask-str"
-                class="text-xl text-yellow-400 font-mono tracking-widest bg-black py-2 rounded"
-              >
-                rwxr-xr-x
+
+              <div class="flex flex-col gap-8 h-full">
+                <div class="flex flex-col">
+                  <h3
+                    class="text-3xl font-bold text-slate-800 border-l-4 border-[#4897e4] pl-3 mb-3 py-2"
+                  >
+                    umask 명령어 가이드
+                  </h3>
+                  <div
+                    class="bg-slate-900 rounded-xl shadow-sm border border-slate-800 p-6 w-full flex flex-col justify-center"
+                  >
+                    <div class="space-y-5 font-mono text-xl">
+                      <div>
+                        <div class="text-yellow-400 font-bold mb-1">
+                          $ umask
+                        </div>
+                        <div class="text-slate-400 text-base ml-3">
+                          # 현재 umask 값 8진수 출력 (예: 0022)
+                        </div>
+                      </div>
+                      <div>
+                        <div class="text-yellow-400 font-bold mb-1">
+                          $ umask -S
+                        </div>
+                        <div class="text-slate-400 text-base ml-3">
+                          # 기호(Symbolic)로 직관적 확인 (예: u=rwx,g=rx,o=rx)
+                        </div>
+                      </div>
+                      <div>
+                        <div class="text-yellow-400 font-bold mb-1">
+                          $ umask 002
+                        </div>
+                        <div class="text-slate-400 text-base ml-3">
+                          # 현재 쉘 세션의 umask 값을 002로 즉시 변경
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="flex flex-col flex-grow">
+                  <h3
+                    class="text-3xl font-bold text-slate-800 border-l-4 border-[#4897e4] pl-3 mb-3 py-2"
+                  >
+                    umask 022 적용 계산식
+                  </h3>
+                  <div
+                    class="bg-slate-900 rounded-xl shadow-sm border border-slate-800 p-5 grid grid-cols-2 gap-4 w-full text-center items-center"
+                  >
+                    <div
+                      class="bg-slate-800 rounded-lg p-4 border border-slate-700 h-full flex flex-col justify-center"
+                    >
+                      <div
+                        class="text-slate-400 text-sm font-bold uppercase tracking-widest mb-3"
+                      >
+                        Directory (Base 777)
+                      </div>
+                      <div
+                        class="flex justify-center items-center gap-2 text-2xl font-mono"
+                      >
+                        <div class="text-green-400 font-bold">777</div>
+                        <div class="text-slate-500 font-black">-</div>
+                        <div class="text-red-400 font-bold">022</div>
+                        <div class="text-slate-500 font-black">=</div>
+                        <div
+                          class="text-[#4897e4] font-black bg-blue-900 px-4 py-1 rounded"
+                        >
+                          755
+                        </div>
+                      </div>
+                    </div>
+
+                    <div
+                      class="bg-slate-800 rounded-lg p-4 border border-slate-700 h-full flex flex-col justify-center"
+                    >
+                      <div
+                        class="text-slate-400 text-sm font-bold uppercase tracking-widest mb-3"
+                      >
+                        File (Base 666)
+                      </div>
+                      <div
+                        class="flex justify-center items-center gap-2 text-2xl font-mono"
+                      >
+                        <div class="text-green-400 font-bold">666</div>
+                        <div class="text-slate-500 font-black">-</div>
+                        <div class="text-red-400 font-bold">022</div>
+                        <div class="text-slate-500 font-black">=</div>
+                        <div
+                          class="text-[#4897e4] font-black bg-blue-900 px-4 py-1 rounded"
+                        >
+                          644
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
+
+          <!-- <div
+            id="s4-2"
+            class="sub-content flex-col h-full flex-grow overflow-y-auto pr-2 gap-6"
+          >
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 h-full">
+              <div class="flex flex-col gap-6">
+                <div>
+                  <h3
+                    class="text-3xl font-bold text-slate-800 border-l-4 border-[#4897e4] pl-3 mb-3 py-2"
+                  >
+                    적용 범위 및 명령어 옵션
+                  </h3>
+                  <p class="text-xl text-slate-600 leading-relaxed pb-2 pl-5">
+                    umask를 시스템에 영구적으로 적용하는 계층적 방법과, 상태를
+                    확인하는 주요 옵션입니다.
+                  </p>
+                </div>
+
+                <div class="flex flex-col gap-4 pl-3">
+                  <div
+                    class="bg-indigo-50 border border-indigo-200 rounded-xl p-5 shadow-sm"
+                  >
+                    <h4
+                      class="text-xl font-bold text-indigo-800 mb-2 flex items-center gap-2"
+                    >
+                      <span class="text-2xl">&#x1F310;</span> 시스템 전역 설정
+                      (Global)
+                    </h4>
+                    <p class="text-lg text-indigo-700 leading-relaxed">
+                      모든 사용자에게 공통으로 적용되는 기본 마스크 값입니다.
+                      최고 관리자(root)만 수정할 수 있으며, 주로
+                      <code>/etc/login.defs</code> 파일의 UMASK 변수나
+                      <code>/etc/profile</code> 최하단에 명시하여 시스템 전체의
+                      보안 정책을 강제합니다.
+                    </p>
+                  </div>
+
+                  <div
+                    class="bg-sky-50 border border-sky-200 rounded-xl p-5 shadow-sm"
+                  >
+                    <h4
+                      class="text-xl font-bold text-sky-800 mb-2 flex items-center gap-2"
+                    >
+                      <span class="text-2xl">&#x1F464;</span> 사용자 개별 설정
+                      (Local)
+                    </h4>
+                    <p class="text-lg text-sky-700 leading-relaxed">
+                      특정 계정에만 적용되는 마스크 값으로, 전역 설정보다
+                      우선순위가 높습니다. 사용자의 홈 디렉터리에 위치한
+                      <code>~/.bashrc</code> 또는 <code>~/.bash_profile</code>에
+                      <code>umask 022</code>를 추가하여 개별적인 작업 환경을
+                      구성합니다.
+                    </p>
+                  </div>
+                </div>
+
+                <div
+                  class="bg-slate-900 rounded-xl shadow-sm border border-slate-800 p-6 w-full flex-grow mt-2 flex flex-col justify-center"
+                >
+                  <div class="space-y-5 font-mono text-xl">
+                    <div>
+                      <div class="text-yellow-400 font-bold mb-1">
+                        $ umask -S
+                      </div>
+                      <div class="text-slate-400 text-base ml-2">
+                        # 기호(Symbolic) 출력: u=rwx,g=rx,o=rx
+                      </div>
+                    </div>
+                    <div>
+                      <div class="text-yellow-400 font-bold mb-1">
+                        $ umask -p
+                      </div>
+                      <div class="text-slate-400 text-base ml-2">
+                        # 재적용 가능한 포맷 출력: umask 0022
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="flex flex-col gap-6">
+                <div>
+                  <h3
+                    class="text-3xl font-bold text-slate-800 border-l-4 border-[#4897e4] pl-3 mb-3 py-2"
+                  >
+                    보안 수준별 umask 프로필
+                  </h3>
+                  <p class="text-xl text-slate-600 leading-relaxed pb-2 pl-5">
+                    서버의 목적과 협업 환경에 따라 가장 널리 사용되는 3가지 표준
+                    실무 프로필입니다.
+                  </p>
+                </div>
+
+                <div class="flex flex-col gap-5 pl-3 flex-grow justify-center">
+                  <div
+                    class="bg-emerald-50 border-l-8 border-emerald-500 rounded-lg p-5 shadow-sm flex flex-col gap-2"
+                  >
+                    <div class="flex justify-between items-end">
+                      <h4 class="text-2xl font-bold text-emerald-800">
+                        022 (기본 표준)
+                      </h4>
+                      <span
+                        class="text-emerald-700 font-mono font-bold text-lg bg-emerald-100 px-2 py-1 rounded"
+                        >Dir: 755 / File: 644</span
+                      >
+                    </div>
+                    <p class="text-lg text-emerald-700 leading-relaxed">
+                      리눅스의 기본 배포 상태입니다. 소유자만 쓰기 권한을
+                      가지며, 그룹과 기타 사용자는 읽기 및 탐색만 가능합니다.
+                      <strong
+                        >일반적인 시스템 운영에 가장 안전하고 권장되는
+                        형태</strong
+                      >입니다.
+                    </p>
+                  </div>
+
+                  <div
+                    class="bg-blue-50 border-l-8 border-blue-500 rounded-lg p-5 shadow-sm flex flex-col gap-2"
+                  >
+                    <div class="flex justify-between items-end">
+                      <h4 class="text-2xl font-bold text-blue-800">
+                        002 (팀 협업)
+                      </h4>
+                      <span
+                        class="text-blue-700 font-mono font-bold text-lg bg-blue-100 px-2 py-1 rounded"
+                        >Dir: 775 / File: 664</span
+                      >
+                    </div>
+                    <p class="text-lg text-blue-800 leading-relaxed">
+                      같은 그룹(Group)에 속한 멤버들에게도 쓰기 권한을
+                      허용합니다. 여러 명의 팀원들이
+                      <strong
+                        >공용 디렉터리에서 함께 소스 코드를 수정하고
+                        공유</strong
+                      >해야 하는 프로젝트 서버에 필수로 적용됩니다.
+                    </p>
+                  </div>
+
+                  <div
+                    class="bg-red-50 border-l-8 border-red-500 rounded-lg p-5 shadow-sm flex flex-col gap-2"
+                  >
+                    <div class="flex justify-between items-end">
+                      <h4 class="text-2xl font-bold text-red-800">
+                        077 (폐쇄 보안)
+                      </h4>
+                      <span
+                        class="text-red-700 font-mono font-bold text-lg bg-red-100 px-2 py-1 rounded"
+                        >Dir: 700 / File: 600</span
+                      >
+                    </div>
+                    <p class="text-lg text-red-800 leading-relaxed">
+                      소유자를 제외한 모든 사용자의 접근을 원천 차단합니다. 다른
+                      사람이 절대 열어보거나 수정해서는 안 되는
+                      <strong
+                        >인증서, DB 암호화 키, 프라이빗 데이터를 다루는
+                        서버</strong
+                      >에 제한적으로 사용됩니다.
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div> -->
         </div>
 
-        <!-- ============================== 6) 특수 접근 권한 ============================== -->
-        <div
-          id="s6-special"
-          class="section-content flex-col h-full justify-center"
-        >
-          <div
-            class="bg-blue-50 border-l-4 border-[#4897e4] p-4 mb-6 flex-shrink-0"
-          >
-            <h4 class="font-bold text-[#4897e4] text-base mb-1">
-              명령어 문법: chmod 4000 / chmod u+s 등
-            </h4>
-            <p class="text-sm text-slate-700">
-              기본적인 UGO 권한 앞자리에 4, 2, 1의 숫자를 부여하거나 특정 문자를
-              사용하여 협업 및 보안 충돌을 제어하는 특수 권한을 설정합니다.
-            </p>
+        <!-- ============================== 5) 특수 접근 권한 ============================== -->
+        <div id="s5-special" class="section-content flex-col h-full">
+          <div class="flex gap-2 mb-4 flex-shrink-0">
+            <button
+              onclick="switchSub(this, 's5-1')"
+              class="sub-btn active px-4 py-2 rounded-md text-sm"
+            >
+              5-1. SetUID (권한 승격)
+            </button>
+            <button
+              onclick="switchSub(this, 's5-2')"
+              class="sub-btn px-4 py-2 rounded-md text-sm"
+            >
+              5-2. SetGID (그룹 상속)
+            </button>
+            <button
+              onclick="switchSub(this, 's5-3')"
+              class="sub-btn px-4 py-2 rounded-md text-sm"
+            >
+              5-3. Sticky Bit (삭제 통제)
+            </button>
+            <button
+              onclick="switchSub(this, 's5-4')"
+              class="sub-btn px-4 py-2 rounded-md text-sm"
+            >
+              5-4. 대/소문자 표기 의미
+            </button>
           </div>
 
           <div
-            class="grid grid-cols-1 md:grid-cols-3 gap-4 flex-grow items-center"
+            id="s5-1"
+            class="sub-content active flex-col h-full flex-grow overflow-y-auto pr-2 gap-8"
           >
-            <div
-              class="bg-slate-50 border-t-4 border-red-500 rounded p-6 shadow-sm h-full flex flex-col justify-center text-center"
-            >
-              <span class="text-4xl mb-2">&#x1F482;</span>
-              <h4 class="font-bold text-lg text-slate-800">SetUID</h4>
-              <span
-                class="text-xs bg-slate-200 px-2 py-1 rounded font-mono font-bold w-max mx-auto my-2"
-                >4000 (s)</span
-              >
-              <p class="text-xs text-slate-600 mb-2">
-                실행 중 임시로 <strong>파일 소유자(root)</strong> 권한 승격
-              </p>
-              <code class="text-xs bg-white border p-1 rounded mt-auto"
-                >ex: /usr/bin/passwd</code
-              >
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 h-full">
+              <div class="flex flex-col gap-6">
+                <div>
+                  <h3
+                    class="text-3xl font-bold text-slate-800 border-l-4 border-red-500 pl-3 mb-3 py-2"
+                  >
+                    SetUID (4000 / u+s)
+                  </h3>
+                  <p class="text-xl text-slate-600 leading-relaxed pb-2 pl-5">
+                    파일을 실행하는 동안, 프로세스의 권한이 실행한 사용자가 아닌
+                    <strong>'파일의 소유자(User)' 권한으로 임시 승격</strong
+                    >되는 특수 권한입니다.<br />(디렉토리에서는 권한이
+                    무시됩니다.)
+                  </p>
+                </div>
+                <div
+                  class="bg-red-50 border border-red-200 rounded-xl p-6 shadow-sm"
+                >
+                  <h4
+                    class="text-xl font-bold text-red-800 mb-3 flex items-center gap-2"
+                  >
+                    사용 예시: /usr/bin/passwd
+                  </h4>
+                  <p class="text-lg text-red-700 leading-relaxed">
+                    일반 사용자가 자신의 비밀번호를 변경하려면 시스템 핵심
+                    파일인 <code>/etc/shadow</code>(root 소유)를 수정해야
+                    합니다. 일반 계정은 이 파일에 쓰기 권한이 없지만,
+                    <code>passwd</code> 명령어 파일에 SetUID가 걸려있기 때문에
+                    실행하는 순간만 임시로 <strong>root 권한</strong>을 빌려
+                    비밀번호를 변경할 수 있습니다.
+                  </p>
+                </div>
+              </div>
+              <div class="flex flex-col gap-6">
+                <h3
+                  class="text-3xl font-bold text-slate-800 border-l-4 border-red-500 pl-3 mb-3 py-2"
+                >
+                  명령어 및 시각화
+                </h3>
+                <div
+                  class="bg-slate-900 rounded-xl shadow-sm border border-slate-800 p-6 w-full flex flex-col justify-center"
+                >
+                  <div class="space-y-6 font-mono text-xl">
+                    <div>
+                      <div class="text-[#4897e4] font-bold mb-1">
+                        $ chmod 4755 script.sh
+                      </div>
+                      <div class="text-[#4897e4] font-bold mb-1">
+                        $ chmod u+s script.sh
+                      </div>
+                      <div class="text-slate-400 text-base mt-2">
+                        # 기존 권한(755) 앞에 4를 붙여 SetUID 부여
+                      </div>
+                    </div>
+                    <div
+                      class="bg-slate-800 p-4 rounded-lg flex items-center justify-between border border-slate-700 mt-6"
+                    >
+                      <span class="text-slate-300">표기 변경:</span>
+                      <div
+                        class="text-2xl font-bold text-white tracking-widest"
+                      >
+                        -rw<span class="text-red-400">s</span>r-xr-x
+                      </div>
+                    </div>
+                    <div class="text-slate-500 text-sm text-right">
+                      소유자의 x 자리가 s로 변경됨
+                    </div>
+                  </div>
+                </div>
+              </div>
             </div>
+          </div>
 
-            <div
-              class="bg-slate-50 border-t-4 border-purple-500 rounded p-6 shadow-sm h-full flex flex-col justify-center text-center"
-            >
-              <span class="text-4xl mb-2">&#x1F46A;</span>
-              <h4 class="font-bold text-lg text-slate-800">SetGID</h4>
-              <span
-                class="text-xs bg-slate-200 px-2 py-1 rounded font-mono font-bold w-max mx-auto my-2"
-                >2000 (s)</span
-              >
-              <p class="text-xs text-slate-600 mb-2">
-                생성 파일이 <strong>상위 폴더 그룹</strong>을 강제 상속
-              </p>
-              <code class="text-xs bg-white border p-1 rounded mt-auto"
-                >ex: 공용 프로젝트 폴더</code
-              >
+          <div
+            id="s5-2"
+            class="sub-content flex-col h-full flex-grow overflow-y-auto pr-2 gap-8"
+          >
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 h-full">
+              <div class="flex flex-col gap-6">
+                <div>
+                  <h3
+                    class="text-3xl font-bold text-slate-800 border-l-4 border-purple-500 pl-3 mb-3 py-2"
+                  >
+                    SetGID (2000 / g+s)
+                  </h3>
+                  <p class="text-xl text-slate-600 leading-relaxed pb-2 pl-5">
+                    디렉터리에 설정될 경우, 내부에 새로 생성되는 모든 파일과
+                    하위 폴더가
+                    <strong>'부모 디렉터리의 소속 그룹'을 강제 상속</strong>받게
+                    만드는 특수 권한입니다.
+                  </p>
+                </div>
+                <div
+                  class="bg-purple-50 border border-purple-200 rounded-xl p-6 shadow-sm"
+                >
+                  <h4
+                    class="text-xl font-bold text-purple-800 mb-3 flex items-center gap-2"
+                  >
+                    사용 예시: 공용 프로젝트 폴더
+                  </h4>
+                  <p class="text-lg text-purple-700 leading-relaxed">
+                    그룹이 공용으로 사용하는 폴더에 SetGID를 설정합니다. 이렇게
+                    하면 user01이 파일을 만들든, user02가 만들든 생성된 파일의
+                    그룹이 자동으로
+                    <strong>해당 그룹</strong>으로 고정됩니다.<br />SetGID가
+                    없으면, 각 사용자가 자신의 기본 그룹으로 파일이 생성되어
+                    협업이 매끄럽게 진행하기 어렵습니다.
+                  </p>
+                </div>
+              </div>
+              <div class="flex flex-col gap-6">
+                <h3
+                  class="text-3xl font-bold text-slate-800 border-l-4 border-purple-500 pl-3 mb-3 py-2"
+                >
+                  명령어 및 시각화
+                </h3>
+                <div
+                  class="bg-slate-900 rounded-xl shadow-sm border border-slate-800 p-6 w-full flex flex-col justify-center"
+                >
+                  <div class="space-y-6 font-mono text-xl">
+                    <div>
+                      <div class="text-[#4897e4] font-bold mb-1">
+                        $ chmod 2775 /shared
+                      </div>
+                      <div class="text-[#4897e4] font-bold mb-1">
+                        $ chmod g+s /shared
+                      </div>
+                      <div class="text-slate-400 text-base mt-2">
+                        # 기존 권한(775) 앞에 2를 붙여 SetGID 부여
+                      </div>
+                    </div>
+                    <div
+                      class="bg-slate-800 p-4 rounded-lg flex items-center justify-between border border-slate-700 mt-6"
+                    >
+                      <span class="text-slate-300">표기 변경:</span>
+                      <div
+                        class="text-2xl font-bold text-white tracking-widest"
+                      >
+                        drwxr-x<span class="text-purple-400">s</span>r-x
+                      </div>
+                    </div>
+                    <div class="text-slate-500 text-sm text-right">
+                      그룹의 x 자리가 s로 변경됨
+                    </div>
+                  </div>
+                </div>
+              </div>
             </div>
+          </div>
 
-            <div
-              class="bg-slate-50 border-t-4 border-orange-500 rounded p-6 shadow-sm h-full flex flex-col justify-center text-center"
-            >
-              <span class="text-4xl mb-2">&#x1F4CC;</span>
-              <h4 class="font-bold text-lg text-slate-800">Sticky Bit</h4>
-              <span
-                class="text-xs bg-slate-200 px-2 py-1 rounded font-mono font-bold w-max mx-auto my-2"
-                >1000 (t)</span
-              >
-              <p class="text-xs text-slate-600 mb-2">
-                공용 폴더여도 <strong>소유자 본인</strong>만 파일 삭제 허용
-              </p>
-              <code class="text-xs bg-white border p-1 rounded mt-auto"
-                >ex: /tmp</code
-              >
+          <div
+            id="s5-3"
+            class="sub-content flex-col h-full flex-grow overflow-y-auto pr-2 gap-8"
+          >
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 h-full">
+              <div class="flex flex-col gap-6">
+                <div>
+                  <h3
+                    class="text-3xl font-bold text-slate-800 border-l-4 border-orange-500 pl-3 mb-3 py-2"
+                  >
+                    Sticky Bit (1000 / o+t)
+                  </h3>
+                  <p class="text-xl text-slate-600 leading-relaxed pb-2 pl-5">
+                    쓰기(w) 권한이 허용된 디렉터리라 할지라도,
+                    <strong
+                      >파일의 삭제 및 이름 변경은 오직 '파일의 소유자'나
+                      'root'만 가능</strong
+                    >하도록 통제하는 보안 장치입니다.<br />(파일에서는 권한이
+                    무시됩니다.)
+                  </p>
+                </div>
+                <div
+                  class="bg-orange-50 border border-orange-200 rounded-xl p-6 shadow-sm"
+                >
+                  <h4
+                    class="text-xl font-bold text-orange-800 mb-3 flex items-center gap-2"
+                  >
+                    <span class="text-2xl">&#x1F4CC;</span> 사용 예시: /tmp
+                    디렉터리
+                  </h4>
+                  <p class="text-lg text-orange-700 leading-relaxed">
+                    시스템의 <code>/tmp</code> 폴더는 모든 사용자가 임시 파일을
+                    생성하고 수정할 수 있는 공용 공간입니다. 누구나 파일을 쓸 수
+                    있어야 하지만, 타인이 내 임시 파일 지우기 못하게 Sticky
+                    Bit는 이를 막아
+                    <strong>자기가 만든 파일만 지울 수 있게 보장</strong>합니다.
+                  </p>
+                </div>
+              </div>
+              <div class="flex flex-col gap-6">
+                <h3
+                  class="text-3xl font-bold text-slate-800 border-l-4 border-orange-500 pl-3 mb-3 py-2"
+                >
+                  명령어 및 시각화
+                </h3>
+                <div
+                  class="bg-slate-900 rounded-xl shadow-sm border border-slate-800 p-6 w-full flex flex-col justify-center"
+                >
+                  <div class="space-y-6 font-mono text-xl">
+                    <div>
+                      <div class="text-[#4897e4] font-bold mb-1">
+                        $ chmod 1777 /tmp
+                      </div>
+                      <div class="text-[#4897e4] font-bold mb-1">
+                        $ chmod o+t /tmp
+                      </div>
+                      <div class="text-slate-400 text-base mt-2">
+                        # 기존 권한(777) 앞에 1을 붙여 Sticky Bit 부여
+                      </div>
+                    </div>
+                    <div
+                      class="bg-slate-800 p-4 rounded-lg flex items-center justify-between border border-slate-700 mt-6"
+                    >
+                      <span class="text-slate-300">표기 변경:</span>
+                      <div
+                        class="text-2xl font-bold text-white tracking-widest"
+                      >
+                        drwxrwxrw<span class="text-orange-400">t</span>
+                      </div>
+                    </div>
+                    <div class="text-slate-500 text-sm text-right">
+                      기타(Others)의 x 자리가 t로 변경됨
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div
+            id="s5-4"
+            class="sub-content flex-col h-full flex-grow overflow-y-auto pr-2 gap-8"
+          >
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 h-full">
+              <div class="flex flex-col gap-6">
+                <div>
+                  <h3
+                    class="text-3xl font-bold text-slate-800 border-l-4 border-slate-500 pl-3 mb-3 py-2"
+                  >
+                    실행 권한 의존성과 오류 표기 (S/T)
+                  </h3>
+                  <p class="text-xl text-slate-600 leading-relaxed pb-2 pl-5">
+                    특수 권한은 기본적으로
+                    <strong>실행 권한(x)을 기반</strong>으로 동작합니다. 따라서
+                    대상에 실행 권한이 애초에 부여되어 있었는지에 따라 대문자와
+                    소문자로 다르게 표기됩니다.
+                  </p>
+                </div>
+                <div class="flex flex-col gap-4 pl-3 flex-grow justify-center">
+                  <div
+                    class="bg-green-50 border border-green-200 rounded-xl p-5 shadow-sm"
+                  >
+                    <h4 class="text-xl font-bold text-green-800 mb-2">
+                      소문자 표기 (<code class="bg-green-100 px-1 rounded"
+                        >s</code
+                      >, <code class="bg-green-100 px-1 rounded">t</code>) =
+                      정상 작동
+                    </h4>
+                    <p class="text-lg text-green-700 leading-relaxed">
+                      원래 <strong>실행(x) 권한이 있는 상태</strong>에서 특수
+                      권한을 부여한 경우입니다. 특수 권한이 정상적으로 제 기능을
+                      발휘하고 있음을 의미합니다.
+                    </p>
+                  </div>
+                  <div
+                    class="bg-red-50 border border-red-200 rounded-xl p-5 shadow-sm"
+                  >
+                    <h4 class="text-xl font-bold text-red-800 mb-2">
+                      대문자 표기 (<code class="bg-red-100 px-1 rounded">S</code
+                      >, <code class="bg-red-100 px-1 rounded">T</code>) = 오류
+                      상태
+                    </h4>
+                    <p class="text-lg text-red-800 leading-relaxed">
+                      원래 <strong>실행(x) 권한이 없는 상태</strong>(예:
+                      644)에서 특수 권한만 억지로 부여한 경우입니다. 기반이 되는
+                      실행 권한이 없으므로 해당 특수 권한은 무용지물이며,
+                      관리자에게 시각적인 경고를 주는 역할입니다.
+                    </p>
+                  </div>
+                </div>
+              </div>
+              <div class="flex flex-col gap-6 h-full">
+                <h3
+                  class="text-3xl font-bold text-slate-800 border-l-4 border-slate-500 pl-3 mb-3 py-2"
+                >
+                  표기 비교 분석
+                </h3>
+                <div
+                  class="bg-slate-900 rounded-xl shadow-sm border border-slate-800 p-6 w-full flex-grow flex flex-col justify-center gap-8"
+                >
+                  <div
+                    class="bg-slate-800 border border-slate-700 p-5 rounded-lg"
+                  >
+                    <div
+                      class="text-green-400 font-bold mb-2 flex justify-between items-center text-lg"
+                    >
+                      <span>1. 정상 작동 (755에 4000 부여)</span>
+                      <span class="text-sm border border-green-400 px-2 rounded"
+                        >x 보유</span
+                      >
+                    </div>
+                    <div
+                      class="text-3xl font-mono text-white text-center tracking-[0.2em] my-4"
+                    >
+                      -rw<span class="text-green-400 font-black text-4xl"
+                        >s</span
+                      >r-xr-x
+                    </div>
+                    <div class="text-slate-400 text-base text-center">
+                      실행 권한(x)이 존재하므로 소문자 's' 표기
+                    </div>
+                  </div>
+
+                  <div
+                    class="bg-slate-800 border border-slate-700 p-5 rounded-lg"
+                  >
+                    <div
+                      class="text-red-400 font-bold mb-2 flex justify-between items-center text-lg"
+                    >
+                      <span>2. 오류 (644에 4000 부여)</span>
+                      <span class="text-sm border border-red-400 px-2 rounded"
+                        >x 없음</span
+                      >
+                    </div>
+                    <div
+                      class="text-3xl font-mono text-white text-center tracking-[0.2em] my-4"
+                    >
+                      -rw<span class="text-red-400 font-black text-4xl">S</span
+                      >r--r--
+                    </div>
+                    <div class="text-slate-400 text-base text-center">
+                      실행 권한(x)이 결여되어 대문자 'S'로 경고 표기
+                    </div>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         </div>
@@ -1660,8 +2226,10 @@
           el.classList.add("text-slate-600");
         });
         const activeBtn = document.getElementById("btn-" + tabId);
-        activeBtn.classList.add("active");
-        activeBtn.classList.remove("text-slate-600");
+        if (activeBtn) {
+          activeBtn.classList.add("active");
+          activeBtn.classList.remove("text-slate-600");
+        }
 
         // 메인 섹션 뷰 업데이트
         document
@@ -1670,10 +2238,34 @@
         document.getElementById(tabId).classList.add("active");
 
         // 메인 타이틀 업데이트
-        document.getElementById("main-title").innerText = tabTitles[tabId];
+        if (tabTitles[tabId]) {
+          document.getElementById("main-title").innerText = tabTitles[tabId];
+        }
 
-        // Live Server 새로고침 시 상태 유지를 위한 로컬 스토리지 저장
+        // 메인 탭 상태 저장
         localStorage.setItem("activeMainTab", tabId);
+
+        // [추가된 로직] 메인 탭을 누를 때, 이전에 보던 소항목 탭이 있다면 자동으로 열어주기
+        const savedSubTab = localStorage.getItem("activeSubTab_" + tabId);
+        if (savedSubTab) {
+          const targetBtn = document.querySelector(
+            `button[onclick*="'${savedSubTab}'"]`,
+          );
+          if (targetBtn) {
+            // switchSub를 직접 호출하지 않고 내부 로직만 수행하여 무한루프 방지
+            const parent = targetBtn.parentElement;
+            parent
+              .querySelectorAll(".sub-btn")
+              .forEach((btn) => btn.classList.remove("active"));
+            targetBtn.classList.add("active");
+
+            const section = parent.parentElement;
+            section
+              .querySelectorAll(".sub-content")
+              .forEach((el) => el.classList.remove("active"));
+            document.getElementById(savedSubTab).classList.add("active");
+          }
+        }
 
         // 모바일/오버레이 환경에서 클릭 시 메뉴 자동 닫기
         const sidebar = document.getElementById("sidebar");
@@ -1681,7 +2273,7 @@
           toggleSidebar();
         }
 
-        // 통합된 2번 섹션에서 차트 리사이즈 이슈 방지
+        // 차트 리사이즈 이슈 방지
         if (tabId === "s2-permissions" && permChart) {
           setTimeout(() => {
             permChart.resize();
@@ -1704,10 +2296,10 @@
           .forEach((el) => el.classList.remove("active"));
         document.getElementById(subId).classList.add("active");
 
-        // Live Server 새로고침 시 상태 유지를 위한 로컬 스토리지 저장 (부모 섹션 ID를 키값에 포함)
+        // 소항목 탭 상태 저장
         localStorage.setItem("activeSubTab_" + section.id, subId);
 
-        // 숫자 방식 탭(s2-2) 클릭 시 차트 리사이즈
+        // 차트 리사이즈
         if (subId === "s2-2" && permChart) {
           setTimeout(() => {
             permChart.resize();
@@ -1718,7 +2310,9 @@
       let permChart;
 
       function initChart() {
-        const ctx = document.getElementById("permChart").getContext("2d");
+        const canvas = document.getElementById("permChart");
+        if (!canvas) return; // 요소가 없으면 건너뜀
+        const ctx = canvas.getContext("2d");
         permChart = new Chart(ctx, {
           type: "bar",
           data: {
@@ -1781,6 +2375,9 @@
       }
 
       function calcPerms() {
+        // 요소가 존재하는지 먼저 확인 (에러 방지 방어코드)
+        if (!document.getElementById("u-r")) return;
+
         const u =
           (document.getElementById("u-r").checked ? 4 : 0) +
           (document.getElementById("u-w").checked ? 2 : 0) +
@@ -1810,7 +2407,6 @@
       function copyCmd(elementId) {
         const text = document.getElementById(elementId).innerText;
         try {
-          document.execCommand("copy");
           const textarea = document.createElement("textarea");
           textarea.value = text;
           document.body.appendChild(textarea);
@@ -1832,7 +2428,11 @@
       }
 
       function calcUmask() {
-        const type = document.getElementById("umask-type").value;
+        // [핵심] HTML에 입력 폼이 없으면 에러를 내지 않고 안전하게 함수 종료
+        const typeElem = document.getElementById("umask-type");
+        if (!typeElem) return;
+
+        const type = typeElem.value;
         let maxStr = type === "dir" ? "777" : "666";
         document.getElementById("umask-max").innerText = maxStr;
 
@@ -1863,17 +2463,12 @@
       }
 
       window.onload = function () {
-        initChart();
-        calcPerms();
-        calcUmask();
-
-        // 브라우저 렌더링 완료 후 로컬 스토리지에서 기존 상태 복원
+        // 1. [우선순위 1] 브라우저 렌더링 완료 후 로컬 스토리지 상태 복원을 가장 먼저 실행
         const savedMainTab = localStorage.getItem("activeMainTab");
         if (savedMainTab) {
           switchTab(savedMainTab);
         }
 
-        // 현재 활성화된 메인 탭에 종속된 소항목 상태 복원
         const currentMainTabId = savedMainTab || "s1-attributes";
         const savedSubTab = localStorage.getItem(
           "activeSubTab_" + currentMainTabId,
@@ -1886,6 +2481,11 @@
             switchSub(targetBtn, savedSubTab);
           }
         }
+
+        // 2. [우선순위 2] 탭 복원이 안전하게 끝난 후 차트 및 계산기 초기화
+        initChart();
+        calcPerms();
+        calcUmask();
       };
     </script>
   </body>
